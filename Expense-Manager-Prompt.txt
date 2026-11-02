@@ -1,0 +1,10 @@
+Create an html, css and javascript app called expense-manager which is used for managing daily expenses and income transactions. Use the current workspace/folder to create necessary files. The requirements of the application are mentioned below:
+1. On the top of the application create 3 cards - Income, Expense, Total Balance.
+2. Each Card must display the amount respectively with different background color - Light red for expense, light green for income and light blue for total balance.
+3. Below to the cards there should be a form with fields - Description, Amount, date of transaction, transaction type.
+4. Next is the list of transactions which displays the transaction information with different background color. Use negative and positive sign for expense and income respectively. In each list item display the date with calendar icon.
+5. Keep the look and feel of the application modern and elegant.
+6. Add an option on the top of the application to switch the overall theme of the application to dark or light.
+7. The overall interface must be in center screen position and must be responsive to display in different screen sizes.
+8. Use only html, css and javascript to create this application and store the data in local storage of the browser.
+9. Use font awesome icons for adding the icons in this application to make the application looks good.

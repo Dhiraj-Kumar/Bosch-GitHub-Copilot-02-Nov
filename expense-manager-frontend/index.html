@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense Manager</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    // Apply saved theme before render to avoid a flash
+    document.documentElement.setAttribute('data-theme', localStorage.getItem('expense-manager-theme') || 'light');
+  </script>
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <h1><i class="fa-solid fa-wallet"></i> Expense Manager</h1>
+      <div class="header-actions">
+        <button id="currency-toggle" class="theme-toggle" type="button" aria-label="Switch currency" title="Switch currency">
+          <i class="fa-solid fa-dollar-sign"></i>
+        </button>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch theme" title="Switch theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <section class="cards" aria-label="Summary">
+      <article class="card card-income">
+        <div class="card-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+        <div>
+          <span class="card-label">Income</span>
+          <strong id="income-amount" class="card-amount">$0.00</strong>
+        </div>
+      </article>
+      <article class="card card-expense">
+        <div class="card-icon"><i class="fa-solid fa-arrow-trend-down"></i></div>
+        <div>
+          <span class="card-label">Expense</span>
+          <strong id="expense-amount" class="card-amount">$0.00</strong>
+        </div>
+      </article>
+      <article class="card card-balance">
+        <div class="card-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+        <div>
+          <span class="card-label">Total Balance</span>
+          <strong id="balance-amount" class="card-amount">$0.00</strong>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2><i class="fa-solid fa-circle-plus"></i> Add Transaction</h2>
+      <form id="transaction-form" novalidate>
+        <div class="form-grid">
+          <div class="field field-wide">
+            <label for="description">Description</label>
+            <input type="text" id="description" placeholder="e.g. Groceries" maxlength="80" required />
+          </div>
+          <div class="field">
+            <label for="amount">Amount</label>
+            <input type="number" id="amount" placeholder="0.00" min="0.01" step="0.01" required />
+          </div>
+          <div class="field">
+            <label for="date">Date</label>
+            <input type="date" id="date" required />
+          </div>
+          <div class="field">
+            <label for="type">Transaction Type</label>
+            <select id="type" required>
+              <option value="expense">Expense</option>
+              <option value="income">Income</option>
+            </select>
+          </div>
+          <div class="field field-submit">
+            <button type="submit" class="btn-primary"><i class="fa-solid fa-plus"></i> Add</button>
+          </div>
+        </div>
+        <p id="form-error" class="form-error" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2><i class="fa-solid fa-list-ul"></i> Transactions</h2>
+      <ul id="transaction-list" class="transaction-list"></ul>
+      <p id="empty-state" class="empty-state">
+        <i class="fa-regular fa-folder-open"></i><br />No transactions yet. Add your first one above.
+      </p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

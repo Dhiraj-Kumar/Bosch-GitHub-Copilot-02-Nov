@@ -1,4 +1,3 @@
-const STORAGE_KEY = 'expense-manager-transactions';
 const THEME_KEY = 'expense-manager-theme';
 
 const form = document.getElementById('transaction-form');
@@ -25,19 +24,56 @@ const CURRENCIES = {
 let currentCurrency = localStorage.getItem(CURRENCY_KEY) === 'INR' ? 'INR' : 'USD';
 const currency = { format: value => CURRENCIES[currentCurrency].format(value) };
 
-function loadTransactions() {
-  try {
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
-  }
+const API_URL = 'http://localhost:8000/transactions';
+
+let transactions = [];
+
+const fromApi = t => ({
+  id: t.id,
+  description: t.description,
+  amount: t.amount,
+  date: t.dateoftransaction,
+  type: t.transactiontype,
+});
+
+async function request(url, options) {
+  const res = await fetch(url, options);
+  if (!res.ok) throw new Error(`Request failed (${res.status})`);
+  return res.status === 204 ? null : res.json();
 }
 
-let transactions = loadTransactions();
+function showError(message) {
+  errorEl.textContent = message;
+  errorEl.hidden = false;
+}
 
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+async function fetchTransactions() {
+  try {
+    const data = await request(API_URL);
+    transactions = data.map(fromApi);
+    errorEl.hidden = true;
+  } catch {
+    showError('Could not load transactions. Is the backend running on http://localhost:8000?');
+  }
+  render();
+}
+
+async function createTransaction({ description, amount, date, type }) {
+  const created = await request(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      description,
+      amount,
+      dateoftransaction: date,
+      transactiontype: type,
+    }),
+  });
+  return fromApi(created);
+}
+
+async function deleteTransaction(id) {
+  await request(`${API_URL}/${id}`, { method: 'DELETE' });
 }
 
 function todayISO() {
@@ -94,10 +130,14 @@ function render() {
     del.setAttribute('aria-label', 'Delete transaction');
     del.title = 'Delete';
     del.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-    del.addEventListener('click', () => {
-      transactions = transactions.filter(x => x.id !== t.id);
-      save();
-      render();
+    del.addEventListener('click', async () => {
+      try {
+        await deleteTransaction(t.id);
+        transactions = transactions.filter(x => x.id !== t.id);
+        render();
+      } catch {
+        showError('Could not delete the transaction. Please try again.');
+      }
     });
 
     li.append(info, amount, del);
@@ -107,7 +147,7 @@ function render() {
   emptyEl.hidden = transactions.length > 0;
 }
 
-form.addEventListener('submit', e => {
+form.addEventListener('submit', async e => {
   e.preventDefault();
   const description = descriptionInput.value.trim();
   const amount = parseFloat(amountInput.value);
@@ -115,19 +155,27 @@ form.addEventListener('submit', e => {
   const type = typeInput.value;
 
   if (!description || !date || !(amount > 0)) {
-    errorEl.textContent = 'Please enter a description, a date and an amount greater than zero.';
-    errorEl.hidden = false;
+    showError('Please enter a description, a date and an amount greater than zero.');
     return;
   }
   errorEl.hidden = true;
 
-  transactions.push({ id: Date.now(), description, amount: Math.round(amount * 100) / 100, date, type });
-  save();
-  render();
+  try {
+    const created = await createTransaction({
+      description,
+      amount: Math.round(amount * 100) / 100,
+      date,
+      type,
+    });
+    transactions.push(created);
+    render();
 
-  form.reset();
-  dateInput.value = todayISO();
-  descriptionInput.focus();
+    form.reset();
+    dateInput.value = todayISO();
+    descriptionInput.focus();
+  } catch {
+    showError('Could not save the transaction. Please try again.');
+  }
 });
 
 function applyTheme(theme) {
@@ -162,4 +210,4 @@ currencyToggle.addEventListener('click', () => {
 dateInput.value = todayISO();
 applyCurrency();
 applyTheme(document.documentElement.getAttribute('data-theme'));
-render();
+fetchTransactions();

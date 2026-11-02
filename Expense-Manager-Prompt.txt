@@ -8,3 +8,18 @@ Create an html, css and javascript app called expense-manager which is used for 
 7. The overall interface must be in center screen position and must be responsive to display in different screen sizes.
 8. Use only html, css and javascript to create this application and store the data in local storage of the browser.
 9. Use font awesome icons for adding the icons in this application to make the application looks good.
+
+Create a fastapi app to build a REST API to perform CRUD operations. The model fields are - description, amount, dateoftransaction and transactiontype. The app uses sqlite to save data in database. Enable cors from all origins and methods. Keep the code minimal.
+
+Integrate the backend api in this app which is running on http://localhost:8000/transactions. Use fetch api for making an http call to the api. The model for the api is 
+```
+{
+  "description": "string",
+  "amount": 0,
+  "dateoftransaction": "2026-11-02",
+  "transactiontype": "income"
+}
+```
+
+Setup this application for using pytest to generate unit test cases
+
